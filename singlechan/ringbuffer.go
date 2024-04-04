@@ -3,7 +3,7 @@ package singlechan
 import "sync"
 
 const (
-	defaultMaxSize = 1
+	defaultBufSize = 1
 )
 
 type RingBuffer struct {
@@ -14,7 +14,7 @@ type RingBuffer struct {
 
 func NewRingBuffer(options ...func(*RingBuffer)) *RingBuffer {
 	ringBuffer := &RingBuffer{
-		maxSize: defaultMaxSize,
+		maxSize: defaultBufSize,
 	}
 
 	for _, o := range options {
@@ -25,7 +25,7 @@ func NewRingBuffer(options ...func(*RingBuffer)) *RingBuffer {
 	return ringBuffer
 }
 
-func WithMaxSize(maxSize int) func(*RingBuffer) {
+func WithBufSize(maxSize int) func(*RingBuffer) {
 	return func(r *RingBuffer) {
 		r.maxSize = maxSize
 	}
