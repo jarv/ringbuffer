@@ -57,5 +57,5 @@ func (r *RingBuffer) Send(item string) {
 }
 
 func (r *RingBuffer) Close() {
-	close(r.outputChannel)
+	close(r.inputChannel)
 }

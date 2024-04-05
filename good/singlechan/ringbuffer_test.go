@@ -5,6 +5,9 @@ import (
 	"strconv"
 	"sync"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var bufferSizes = []int{1, 16, 64, 512, 65536}
@@ -35,7 +38,6 @@ func TestSendRecv(t *testing.T) {
 	var wgRecv sync.WaitGroup
 
 	rb := NewRingBuffer(WithBufSize(bufferSize))
-	defer rb.Close()
 
 	recv(&wgRecv, rb.C())
 
@@ -53,11 +55,21 @@ func TestSendRecv(t *testing.T) {
 		}(i)
 	}
 
-	wgSend.Wait()
-	rb.Send(finalValue)
-	wgRecv.Wait()
+	waitCh := make(chan struct{})
+	go func() {
+		wgSend.Wait()       // Wait for data to be sent concurrently
+		rb.Send(finalValue) // Wait for the final value to be sent
+		rb.Close()          // Close the input channel
+		wgRecv.Wait()       // Wait for the final value to be received
+		close(waitCh)       // Complete the test
+	}()
 
-	// messages received
+	select {
+	case <-waitCh:
+		// messages received
+	case <-time.After(5 * time.Second):
+		assert.FailNow(t, "timed out waiting for data")
+	}
 }
 
 func BenchmarkParallelSendReceive(b *testing.B) {
