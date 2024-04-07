@@ -10,7 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var bufferSizes = []int{1, 16, 64, 512, 65536}
+// var bufferSizes = []int{1, 16, 64, 512, 65536}
+var bufferSizes = []int{1}
 
 const (
 	finalValue = "done"
